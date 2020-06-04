@@ -4,6 +4,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.server.VaadinSession;
@@ -23,7 +25,13 @@ public abstract class AbstractLoggedinView extends AppLayout implements BeforeEn
             }
         }));
 
-        addToNavbar(logoutButton);
+        HorizontalLayout navBar = new HorizontalLayout();
+        navBar.setAlignItems(Alignment.END);
+
+        navBar.add(logoutButton);
+        navBar.getStyle().set("padding", "10px");
+        
+        addToNavbar(navBar);
 
         setContent(initView());
     }

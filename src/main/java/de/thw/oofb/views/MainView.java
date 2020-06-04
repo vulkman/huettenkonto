@@ -3,11 +3,15 @@ package de.thw.oofb.views;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
 import de.thw.oofb.models.Transaction;
@@ -18,17 +22,27 @@ public class MainView extends AbstractLoggedinView {
 
     private static final long serialVersionUID = 2616027330332669858L;
 
+    TransactionRepo transactionRepo;
+
     @Override
     protected Component initView() {
+        this.transactionRepo = new TransactionRepo();
+
         VerticalLayout content = new VerticalLayout();
 
-        content.add(new Label("Transaktionen"));
+        double balance = transactionRepo.getTransactions().stream()
+                .collect(Collectors.summarizingDouble(Transaction::getAmount)).getSum();
+
+        content.add(new H3("Kontostand"));
+        content.add(new Text(DecimalFormat.getCurrencyInstance(Locale.GERMANY).format(balance)));
+
+        content.add(new H3("Transaktionen"));
         content.add(loadGrid());
 
         return content;
     }
 
-    private Grid<Transaction> loadGrid() {
+    private Component loadGrid() {
         Grid<Transaction> grid = new Grid<>(Transaction.class);
 
         grid.removeAllColumns();
@@ -38,9 +52,8 @@ public class MainView extends AbstractLoggedinView {
         grid.addColumn(t -> DecimalFormat.getCurrencyInstance(Locale.GERMANY).format(t.getAmount()))
                 .setHeader("Betrag");
 
-        TransactionRepo transactionRepo = new TransactionRepo();
-
         grid.setItems(transactionRepo.getTransactions());
+
         return grid;
     }
 }
